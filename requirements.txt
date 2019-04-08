@@ -1,2 +1,3 @@
-ZODB==5.5.1
+Click==7.0
 BTrees==4.5.1
+ZODB==5.5.1
