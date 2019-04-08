@@ -6,11 +6,12 @@ import transaction
 class Database(object):
 
     @classmethod
-    def load(cls, path):
-        storage = FileStorage.FileStorage(path)
+    def load(cls, path, read_only=False):
+        storage = FileStorage.FileStorage(path, read_only=read_only)
         db = DB(storage)
         connection = db.open()
         root = connection.root
+        # Create a root if doesn't exist
         if not hasattr(root, "features"):
             root.features = OOBTree()
             transaction.commit()
