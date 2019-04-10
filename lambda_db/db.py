@@ -141,5 +141,11 @@ class Database(object):
         )
         return response['LayerVersions'][0]['Version']
 
+    def arn(self):
+        response = client.list_layer_versions(
+            LayerName=self.config.db_name,
+        )
+        return response['LayerVersions'][0]['LayerVersionArn']
+
     def close(self):
         self.conn.close()
