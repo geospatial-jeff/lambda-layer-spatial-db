@@ -1,21 +1,23 @@
 import sys
-
-
-s2_path = '/home/slingshot/Documents/Cognition/notebooks/s2/source/s2geometry/build/python'
-
-if s2_path not in sys.path:
-    sys.path.append(s2_path)
-
+from tqdm import tqdm
 
 import pywraps2 as s2
 from ZODB import FileStorage, DB
 from BTrees.OOBTree import OOBTree
 import transaction
 
+class DatabaseConfig(object):
+
+    def __init__(self):
+        self.min_res = 10
+        self.max_res = 12
+        self.limit = 100
+        self.unique_id = 'NAME'
+
 class Database(object):
 
     @classmethod
-    def load(cls, path, read_only=False):
+    def load(cls, path, config, read_only=False):
         storage = FileStorage.FileStorage(path, read_only=read_only)
         db = DB(storage)
         connection = db.open()
@@ -24,7 +26,7 @@ class Database(object):
         if not hasattr(root, "features"):
             root.features = OOBTree()
             transaction.commit()
-        return cls(db, connection, root)
+        return cls(db, connection, root, config)
 
     def __enter__(self):
         return self
@@ -32,14 +34,11 @@ class Database(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.close()
 
-    def __init__(self, db, conn, root):
+    def __init__(self, db, conn, root, config):
         self.db = db
         self.conn = conn
         self.root = root
-        self.min_res = 11
-        self.max_res = 14
-        self.limit = 100
-        self.unique_id = 'NAME'
+        self.config = config
 
     def cover_region(self, feature):
         # Cover a feature's extent with S2 cells
@@ -48,21 +47,29 @@ class Database(object):
         rect = s2.S2LatLngRect(s2.S2LatLng.FromDegrees(min(ycoords), min(xcoords)),
                                s2.S2LatLng.FromDegrees(max(ycoords), max(xcoords)))
         coverer = s2.S2RegionCoverer()
-        coverer.set_max_cells(self.limit)
-        coverer.set_min_level(self.min_res)
-        coverer.set_max_level(self.max_res)
+        coverer.set_max_cells(self.config.limit)
+        coverer.set_min_level(self.config.min_res)
+        coverer.set_max_level(self.config.max_res)
         ids = coverer.GetCovering(rect)
         return ids
 
     def load_features(self, feature_collection):
-        for feat in feature_collection['features']:
-            self._load_feature(feat)
+        cellcount = 0
+        print("Loading features")
+        for feat in tqdm(feature_collection['features']):
+            count = self._load_feature(feat)
+            cellcount += count
+        print("Committing transaction")
         transaction.commit()
+
+        print(f"Loaded {cellcount} cells across {len(feature_collection['features'])} ({cellcount/len(feature_collection['features'])} cells per polygon)")
+
 
     def _load_feature(self, feature):
         ids = self.cover_region(feature)
         for id in ids:
             self.root.features[hash(id)] = feature['properties']
+        return len(ids)
 
     def spatial_query(self, geoj):
         region = self.cover_region(geoj)
@@ -76,9 +83,9 @@ class Database(object):
             rmax = hash(cell.range_max())
             response = list(db_feats.items(min=rmin, max=rmax))
             for resp in response:
-                if resp[1][self.unique_id] not in cities:
+                if resp[1][self.config.unique_id] not in cities:
                     valid.append(resp[1])
-                    cities.append(resp[1][self.unique_id])
+                    cities.append(resp[1][self.config.unique_id])
         return valid
 
     def close(self):
