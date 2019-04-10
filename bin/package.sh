@@ -2,7 +2,8 @@
 
 export DEPLOY_DIR=layer
 PYPATH=/var/lang/lib/python3.6/site-packages
-DBNAME=$1
+DB_DIR=lambda_db
+DBNAME=database
 
 echo Creating deploy package
 
@@ -30,8 +31,9 @@ cp /build/s2geometry/build/python/* $DEPLOY_DIR/python/
 
 # Packaging database
 mkdir $DEPLOY_DIR/share
-cp $DBNAME.fs $DEPLOY_DIR/share/
-cp $DBNAME.fs.lock $DEPLOY_DIR/share/
+cp $DB_DIR/$DBNAME.fs $DEPLOY_DIR/share/
+cp $DB_DIR/$DBNAME.fs.lock $DEPLOY_DIR/share/
+cp -r $DB_DIR/*.py $DEPLOY_DIR/python/
 
 # zip up deploy package
 cd $DEPLOY_DIR
