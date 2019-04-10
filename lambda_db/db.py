@@ -21,8 +21,10 @@ class DatabaseConfig(object):
     max_res = 12
     limit = 100
     unique_id = 'NAME'
-    db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
     db_name = 'MyDatabase'
+
+    db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
+    layer_path = os.path.join(os.path.dirname(__file__), 'lambda-layer.zip')
 
 
 class Database(object):
@@ -42,7 +44,7 @@ class Database(object):
 
     @staticmethod
     def load_config(config):
-        expected = ['min_res', 'max_res', 'limit', 'unique_id', 'db_path', 'db_name']
+        expected = ['min_res', 'max_res', 'limit', 'unique_id', 'db_path', 'db_name', 'layer_path']
         for item in expected:
             if not hasattr(config, item):
                 raise ValueError("Configuration is missing the required {} attribute".format(item))
