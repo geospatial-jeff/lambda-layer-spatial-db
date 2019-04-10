@@ -1,7 +1,7 @@
 import json
 
 import click
-from db import Database
+from lambda_db.db import Database
 from analyze import choose_res
 
 
