@@ -1,0 +1,7 @@
+Click==7.0
+BTrees==4.5.1
+numpy==1.16.2
+pyproj==2.1.3
+scipy==1.2.1
+shapely==1.6.4.post2
+ZODB==5.5.1
