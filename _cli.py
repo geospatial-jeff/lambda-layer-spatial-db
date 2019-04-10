@@ -1,3 +1,4 @@
+import os
 import json
 
 import click
@@ -9,14 +10,12 @@ from analyze import choose_res
 def lambda_db():
     pass
 
-
 @lambda_db.command(name="build")
-@click.argument('db_path')
 @click.argument('feature_collection', type=click.File('r'))
-def build(db_path, feature_collection):
+def build(feature_collection):
     data = json.load(feature_collection)
 
-    with Database.load(db_path) as db:
+    with Database.load() as db:
         db.load_features(data)
 
 @lambda_db.command(name="analyze")
