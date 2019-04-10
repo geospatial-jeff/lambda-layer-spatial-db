@@ -1,12 +1,4 @@
 import os
-from tqdm import tqdm
-import sys
-import base64
-
-s2_path = '/home/slingshot/Documents/Cognition/notebooks/s2/source/s2geometry/build/python'
-
-if s2_path not in sys.path:
-    sys.path.append(s2_path)
 
 import pywraps2 as s2
 from ZODB import FileStorage, DB
@@ -81,6 +73,7 @@ class Database(object):
         return ids
 
     def load_features(self, feature_collection):
+        from tqdm import tqdm
         cellcount = 0
         print("Loading features")
         for feat in tqdm(feature_collection['features']):
