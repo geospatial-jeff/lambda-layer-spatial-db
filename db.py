@@ -12,12 +12,14 @@ class DatabaseConfig(object):
     max_res = 12
     limit = 100
     unique_id = 'NAME'
+    db_path = '/path/to/database.fs'
 
 class Database(object):
 
     @classmethod
-    def load(cls, path, config, read_only=False):
-        storage = FileStorage.FileStorage(path, read_only=read_only)
+    def load(cls, config, read_only=False):
+        config = cls.load_config(config)
+        storage = FileStorage.FileStorage(config.db_path, read_only=read_only)
         db = DB(storage)
         connection = db.open()
         root = connection.root
