@@ -2,6 +2,7 @@
 
 export DEPLOY_DIR=layer
 PYPATH=/var/lang/lib/python3.6/site-packages
+DBNAME=$1
 
 echo Creating deploy package
 
@@ -14,7 +15,7 @@ strip $DEPLOY_DIR/lib/* || true
 
 # Moving python libraries
 mkdir $DEPLOY_DIR/python
-EXCLUDE="boto3* botocore* pip* docutils* *.pyc setuptools* wheel* coverage* testfixtures* mock* *.egg-info *.dist-info __pycache__ easy_install.py"
+EXCLUDE="urllib3* s3transfer* boto3* botocore* pip* docutils* *.pyc setuptools* wheel* coverage* testfixtures* mock* *.egg-info *.dist-info __pycache__ easy_install.py"
 
 EXCLUDES=()
 for E in ${EXCLUDE}
@@ -29,7 +30,8 @@ cp /build/s2geometry/build/python/* $DEPLOY_DIR/python/
 
 # Packaging database
 mkdir $DEPLOY_DIR/share
-cp world_cities_db* $DEPLOY_DIR/share/
+cp $DBNAME.fs $DEPLOY_DIR/share/
+cp $DBNAME.fs.lock $DEPLOY_DIR/share/
 
 # zip up deploy package
 cd $DEPLOY_DIR
