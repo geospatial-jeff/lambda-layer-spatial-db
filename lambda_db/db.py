@@ -1,4 +1,11 @@
+import os
 from tqdm import tqdm
+import sys
+
+s2_path = '/home/slingshot/Documents/Cognition/notebooks/s2/source/s2geometry/build/python'
+
+if s2_path not in sys.path:
+    sys.path.append(s2_path)
 
 import pywraps2 as s2
 from ZODB import FileStorage, DB
@@ -14,7 +21,8 @@ class DatabaseConfig(object):
     max_res = 12
     limit = 100
     unique_id = 'NAME'
-    db_path = '/path/to/database.fs'
+    db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
+
 
 class Database(object):
 
