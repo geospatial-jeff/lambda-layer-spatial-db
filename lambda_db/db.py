@@ -51,7 +51,8 @@ class Database(object):
                 raise ValueError("Configuration is missing the required {} attribute".format(item))
 
         # Switch the db path to lambda layer if deployed
-        config.db_path = '/opt/share/database.fs'
+        if deployed:
+            config.db_path = '/opt/share/database.fs'
         return config
 
 
@@ -65,7 +66,7 @@ class Database(object):
         self.db = db
         self.conn = conn
         self.root = root
-        self.config = self.load_config(config)
+        self.config = config
 
     def cover_region(self, feature):
         # Cover a feature's extent with S2 cells
@@ -115,5 +116,14 @@ class Database(object):
                     cities.append(resp[1][self.config.unique_id])
         return valid
 
+    def publish_lambda_layer(self, version):
+        with open('input.zip', 'rb') as deployzip:
+            bytes = deployzip.read()
+            encoded = base64.b64encode(bytes)
+            print(encoded)
+
     def close(self):
         self.conn.close()
+
+with Database.load() as db:
+    print(db.config)
