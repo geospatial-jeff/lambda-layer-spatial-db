@@ -22,6 +22,7 @@ class DatabaseConfig(object):
     limit = 100
     unique_id = 'NAME'
     db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
+    db_name = 'MyDatabase'
 
 
 class Database(object):
@@ -41,7 +42,7 @@ class Database(object):
 
     @staticmethod
     def load_config(config):
-        expected = ['min_res', 'max_res', 'limit', 'unique_id', 'db_path']
+        expected = ['min_res', 'max_res', 'limit', 'unique_id', 'db_path', 'db_name']
         for item in expected:
             if not hasattr(config, item):
                 raise ValueError("Configuration is missing the required {} attribute".format(item))
@@ -107,6 +108,7 @@ class Database(object):
                     valid.append(resp[1])
                     cities.append(resp[1][self.config.unique_id])
         return valid
+
 
     def close(self):
         self.conn.close()
