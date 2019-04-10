@@ -21,7 +21,8 @@ def build(feature_collection):
 
 @lambda_db.command(name="deploy")
 @click.option('tag', '-t', type=str)
-def deploy(tag):
+@click.option('--public', default=False, type=bool)
+def deploy(tag, public):
     # Build lambda layer with docker
     print("Building docker image")
     subprocess.call('docker build . -t {}'.format(tag), shell=True)
@@ -32,10 +33,9 @@ def deploy(tag):
     with Database.load() as db:
         # Publish lambda layer
         print("Publishing lambda layer to AWS")
-        lambda_layer = db.publish_lambda_layer(public=True)
+        lambda_layer = db.publish_lambda_layer(public=public)
 
         print(lambda_layer)
-
 
 @lambda_db.command(name="analyze")
 @click.argument('feature_collection', type=click.File('r'))
@@ -43,3 +43,26 @@ def deploy(tag):
 def analyze(feature_collection, optimize):
     data = json.load(feature_collection)
     choose_res(data, optimize)
+
+@lambda_db.command(name="info")
+def info():
+
+    with Database.load() as db:
+
+        info = {
+            'name': db.config.db_name,
+            'unique_id': db.config.unique_id,
+            'layer_version': db.version(),
+            'layer_arn': db.arn(),
+            'config': {
+                'min_res': db.config.min_res,
+                'max_res': db.config.max_res,
+                'limit': db.config.limit,
+            },
+            'paths': {
+                'db_path': db.config.db_path,
+                'layer_path': db.config.layer_path
+            }
+        }
+
+        print(json.dumps(info, indent=2))
