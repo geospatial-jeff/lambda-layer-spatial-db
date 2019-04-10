@@ -55,7 +55,6 @@ class Database(object):
             config.db_path = '/opt/share/database.fs'
         return config
 
-
     def __enter__(self):
         return self
 
@@ -116,14 +115,29 @@ class Database(object):
                     cities.append(resp[1][self.config.unique_id])
         return valid
 
-    def publish_lambda_layer(self, version):
-        with open('input.zip', 'rb') as deployzip:
-            bytes = deployzip.read()
-            encoded = base64.b64encode(bytes)
-            print(encoded)
+    def publish_lambda_layer(self, public=False):
+        with open(self.config.layer_path, 'rb') as deployzip:
+            response = client.publish_layer_version(
+                LayerName=self.config.db_name,
+                Content={
+                    'ZipFile': deployzip.read()
+                },
+            )
+            print(response)
+
+        if public:
+            client.add_layer_version_permission(
+                LayerName=self.config.db_name,
+                VersionNumber=response['Version'],
+                StatementId='public',
+                Action='lambda:GetLayerVersion',
+                Principal='*'
+            )
+
+        return response
 
     def close(self):
         self.conn.close()
 
 with Database.load() as db:
-    print(db.config)
+    db.publish_lambda_layer(public=True)
