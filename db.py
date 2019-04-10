@@ -8,11 +8,10 @@ import transaction
 
 class DatabaseConfig(object):
 
-    def __init__(self):
-        self.min_res = 10
-        self.max_res = 12
-        self.limit = 100
-        self.unique_id = 'NAME'
+    min_res = 10
+    max_res = 12
+    limit = 100
+    unique_id = 'NAME'
 
 class Database(object):
 
@@ -28,6 +27,15 @@ class Database(object):
             transaction.commit()
         return cls(db, connection, root, config)
 
+    @staticmethod
+    def load_config(config):
+        expected = ['min_res', 'max_res', 'limit', 'unique_id']
+        for item in expected:
+            if not hasattr(config, item):
+                raise ValueError("Configuration is missing the required {} attribute".format(item))
+        return config
+
+
     def __enter__(self):
         return self
 
@@ -38,7 +46,7 @@ class Database(object):
         self.db = db
         self.conn = conn
         self.root = root
-        self.config = config
+        self.config = self.load_config(config)
 
     def cover_region(self, feature):
         # Cover a feature's extent with S2 cells
@@ -90,4 +98,3 @@ class Database(object):
 
     def close(self):
         self.conn.close()
-
