@@ -37,4 +37,4 @@ cp -r $DB_DIR/*.py $DEPLOY_DIR/python/
 
 # zip up deploy package
 cd $DEPLOY_DIR
-zip -ruq ../lambda-layer.zip ./
+zip -ruq ../lambda_db/lambda-layer.zip ./
