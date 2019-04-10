@@ -123,7 +123,6 @@ class Database(object):
                     'ZipFile': deployzip.read()
                 },
             )
-            print(response)
 
         if public:
             client.add_layer_version_permission(
@@ -136,8 +135,11 @@ class Database(object):
 
         return response
 
+    def version(self):
+        response = client.list_layer_versions(
+            LayerName=self.config.db_name,
+        )
+        return response['LayerVersions'][0]['Version']
+
     def close(self):
         self.conn.close()
-
-with Database.load() as db:
-    db.publish_lambda_layer(public=True)
