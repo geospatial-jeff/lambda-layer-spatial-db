@@ -1,10 +1,12 @@
-import sys
 from tqdm import tqdm
 
 import pywraps2 as s2
 from ZODB import FileStorage, DB
 from BTrees.OOBTree import OOBTree
 import transaction
+import boto3
+
+client = boto3.client('lambda')
 
 class DatabaseConfig(object):
 
@@ -17,8 +19,8 @@ class DatabaseConfig(object):
 class Database(object):
 
     @classmethod
-    def load(cls, config, read_only=False):
-        config = cls.load_config(config)
+    def load(cls, read_only=False):
+        config = cls.load_config(DatabaseConfig)
         storage = FileStorage.FileStorage(config.db_path, read_only=read_only)
         db = DB(storage)
         connection = db.open()
@@ -31,7 +33,7 @@ class Database(object):
 
     @staticmethod
     def load_config(config):
-        expected = ['min_res', 'max_res', 'limit', 'unique_id']
+        expected = ['min_res', 'max_res', 'limit', 'unique_id', 'db_path']
         for item in expected:
             if not hasattr(config, item):
                 raise ValueError("Configuration is missing the required {} attribute".format(item))
