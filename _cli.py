@@ -35,7 +35,8 @@ def deploy(tag, public):
         print("Publishing lambda layer to AWS")
         lambda_layer = db.publish_lambda_layer(public=public)
 
-        print(lambda_layer)
+        info = db.info()
+        print(info)
 
 @lambda_db.command(name="analyze")
 @click.argument('feature_collection', type=click.File('r'))
@@ -46,23 +47,5 @@ def analyze(feature_collection, optimize):
 
 @lambda_db.command(name="info")
 def info():
-
     with Database.load() as db:
-
-        info = {
-            'name': db.config.db_name,
-            'unique_id': db.config.unique_id,
-            'layer_version': db.version(),
-            'layer_arn': db.arn(),
-            'config': {
-                'min_res': db.config.min_res,
-                'max_res': db.config.max_res,
-                'limit': db.config.limit,
-            },
-            'paths': {
-                'db_path': db.config.db_path,
-                'layer_path': db.config.layer_path
-            }
-        }
-
-        print(json.dumps(info, indent=2))
+        print(json.dumps(db.info(), indent=2))

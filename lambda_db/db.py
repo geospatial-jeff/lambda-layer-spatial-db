@@ -1,4 +1,9 @@
 import os
+import sys
+s2_path = '/home/slingshot/Documents/Cognition/notebooks/s2/source/s2geometry/build/python'
+
+if s2_path not in sys.path:
+    sys.path.append(s2_path)
 
 import pywraps2 as s2
 from ZODB import FileStorage, DB
@@ -139,6 +144,24 @@ class Database(object):
             LayerName=self.config.db_name,
         )
         return response['LayerVersions'][0]['LayerVersionArn']
+
+    def info(self):
+        return {
+            'name': self.config.db_name,
+            'unique_id': self.config.unique_id,
+            'layer_version': self.version(),
+            'layer_arn': self.arn(),
+            'config': {
+                'min_res': self.config.min_res,
+                'max_res': self.config.max_res,
+                'limit': self.config.limit,
+            },
+            'paths': {
+                'db_path': self.config.db_path,
+                'layer_path': self.config.layer_path
+            }
+        }
+
 
     def close(self):
         self.conn.close()
