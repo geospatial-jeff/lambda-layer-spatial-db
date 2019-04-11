@@ -1,0 +1,22 @@
+service: lambda-db-testing
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: us-east-1
+
+iamRoleStatementsName: lambda-db-testing-role
+
+functions:
+  spatial_query:
+    handler: handler.spatial_query
+    memory: 3008
+    layers:
+      - <layer arn>
+
+package:
+  exclude:
+    - "*.fs*"
+    - "*.zip"
+    - "database.py"
