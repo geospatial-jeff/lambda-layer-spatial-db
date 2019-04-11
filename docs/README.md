@@ -8,19 +8,20 @@ If you haven't already, please read through the [database docs](db_schema.md)
 
 ```
 git clone https://github.com/geospatial-jeff/lambda-layer-spatial-db.git
-cd lambda-layer-sptaial-db
+cd lambda-layer-spatial-db
 pip install -e .[dev]
 ```
 
-#### 2. Edit the database configuration at the top of `lambda_db/db.py`.
+#### 2. Edit the database configuration in `lambda_db/config.yml`.
 
 | Variable  |  Description  |
 |---|---|
+|  db_name  |  Name of database.  Also determines name of the Lambda Layer. |
 |  min_res  |  Minimum S2 cell resolution used when generating cell coverages. |
 |  max_res  |  Maximum S2 cell resolution used when generating cell coverages. |
 |  limit  |  Maximum number of S2 cells generated in a single cell coverage. |
 |  unique_id  |  Unique id field of database.  This is used to filter back along the one-to-many relationship to prevent returning duplicate results. |
-|  db_name  |  Name of database.  Also determines name of the Lambda Layer. |
+| compress | Determines if items are compressed (gzip) before inserted into database |
 
 You can create an optimized configuration for generating S2 cell coverages through the CLI.  The following function suggests `min_res`, `max_res`, and `limit` parameters for the input geojson while optimizing for disk space (the algorithm is based on geometry-level statistics such as area, perimeter etc.).  The command will also print out a variety of statistics about your data which can be used to inform your decision.
 
