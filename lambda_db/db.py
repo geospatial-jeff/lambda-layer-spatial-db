@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 
 try:
     import pywraps2 as s2
@@ -29,7 +30,7 @@ class DatabaseConfig(object):
 
     def __init__(self, data):
         self.db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
-        self.layer_path = os.path.join(os.path.dirname(__file__), 'database.fs')
+        self.layer_path = os.path.join(os.path.dirname(__file__), 'lambda-layer.zip')
         for(k,v) in data.items():
             if type(v) == dict:
                 {setattr(self, _k, _v) for (_k,_v) in v.items()}
@@ -42,7 +43,6 @@ class Database(object):
     def load(cls, read_only=False, deployed=False):
         config = cls.load_config(DatabaseConfig.load(), deployed)
         storage = FileStorage.FileStorage(config.db_path, read_only=read_only)
-        print(config.compress)
         if config.compress:
             storage = zc.zlibstorage.ZlibStorage(storage)
         db = DB(storage)
@@ -103,7 +103,6 @@ class Database(object):
         transaction.commit()
 
         print(f"Loaded {cellcount} cells across {len(feature_collection['features'])} ({cellcount/len(feature_collection['features'])} cells per polygon)")
-
 
     def _load_feature(self, feature):
         ids = self.cover_region(feature)
@@ -177,9 +176,5 @@ class Database(object):
             }
         }
 
-
     def close(self):
         self.conn.close()
-
-with Database.load() as db:
-    print(db)
