@@ -39,7 +39,8 @@ class DatabaseConfig(object):
 
     @classmethod
     def load(cls):
-        with open('config.yml') as f:
+        configfile = os.path.join(os.path.dirname(__file__), 'config.yml')
+        with open(configfile) as f:
             data = yaml.safe_load(f)
             return cls(data)
 
@@ -58,6 +59,7 @@ class Database(object):
     def load(cls, read_only=False, deployed=False):
         config = cls.load_config(DatabaseConfig.load(), deployed)
         storage = FileStorage.FileStorage(config.db_path, read_only=read_only)
+        print(config.compress)
         if config.compress:
             storage = zc.zlibstorage.ZlibStorage(storage)
         db = DB(storage)
