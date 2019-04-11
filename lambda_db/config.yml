@@ -1,0 +1,7 @@
+db_name: 'MyDatabase'
+config:
+  min_res: 8
+  max_res: 14
+  limit: 100
+  unique_id: 'NAME'
+  compress: false

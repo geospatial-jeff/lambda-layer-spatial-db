@@ -14,29 +14,52 @@ import zc.zlibstorage
 from BTrees.OOBTree import OOBTree
 import transaction
 import boto3
+import yaml
 
 client = boto3.client('lambda')
 
+
+def new_instance(self):
+    new_self = type(self).__new__(type(self))
+    # Preserve _transform, etc
+    new_self.__dict__ = self.__dict__.copy()
+    new_self.base = self.base.new_instance()
+    # Because these are bound methods, we must re-copy
+    # them or ivars might be wrong, like _transaction
+    for name in self.copied_methods:
+        v = getattr(new_self.base, name, None)
+        if v is not None:
+            setattr(new_self, name, v)
+
+    return new_self
+
+zc.zlibstorage.ZlibStorage.new_instances = new_instance
+
 class DatabaseConfig(object):
 
-    # DB config
-    min_res = 8
-    max_res = 14
-    limit = 100
-    unique_id = 'NAME'
-    db_name = 'WorldCitiesDatabase'
+    @classmethod
+    def load(cls):
+        with open('config.yml') as f:
+            data = yaml.safe_load(f)
+            return cls(data)
 
-    # Paths to things, don't change this
-    db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
-    layer_path = os.path.join(os.path.dirname(__file__), 'lambda-layer.zip')
-
+    def __init__(self, data):
+        self.db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
+        self.layer_path = os.path.join(os.path.dirname(__file__), 'database.fs')
+        for(k,v) in data.items():
+            if type(v) == dict:
+                {setattr(self, _k, _v) for (_k,_v) in v.items()}
+            else:
+                setattr(self, k, v)
 
 class Database(object):
 
     @classmethod
     def load(cls, read_only=False, deployed=False):
-        config = cls.load_config(DatabaseConfig, deployed)
+        config = cls.load_config(DatabaseConfig.load(), deployed)
         storage = FileStorage.FileStorage(config.db_path, read_only=read_only)
+        if config.compress:
+            storage = zc.zlibstorage.ZlibStorage(storage)
         db = DB(storage)
         connection = db.open()
         root = connection.root
@@ -48,7 +71,7 @@ class Database(object):
 
     @staticmethod
     def load_config(config, deployed):
-        expected = ['min_res', 'max_res', 'limit', 'unique_id', 'db_path', 'db_name', 'layer_path']
+        expected = ['min_res', 'max_res', 'limit', 'unique_id', 'db_path', 'db_name', 'layer_path', 'compress']
         for item in expected:
             if not hasattr(config, item):
                 raise ValueError("Configuration is missing the required {} attribute".format(item))
@@ -56,6 +79,7 @@ class Database(object):
         # Switch the db path to lambda layer if deployed
         if deployed:
             config.db_path = '/opt/share/database.fs'
+
         return config
 
     def __enter__(self):
@@ -69,14 +93,6 @@ class Database(object):
         self.conn = conn
         self.root = root
         self.config = config
-
-    def compress(self):
-        new = zc.zlibstorage.ZlibStorage(
-            FileStorage.FileStorage(os.path.splitext(self.config.db_path)[0]+'_compress.fs')
-        )
-        new.copyTransactionsFrom(self.db.storage)
-        new.close()
-
 
     def cover_region(self, feature):
         # Cover a feature's extent with S2 cells
