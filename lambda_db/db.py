@@ -10,6 +10,7 @@ except:
     import pywraps2 as s2
 
 from ZODB import FileStorage, DB
+import zc.zlibstorage
 from BTrees.OOBTree import OOBTree
 import transaction
 import boto3
@@ -68,6 +69,14 @@ class Database(object):
         self.conn = conn
         self.root = root
         self.config = config
+
+    def compress(self):
+        new = zc.zlibstorage.ZlibStorage(
+            FileStorage.FileStorage(os.path.splitext(self.config.db_path)[0]+'_compress.fs')
+        )
+        new.copyTransactionsFrom(self.db.storage)
+        new.close()
+
 
     def cover_region(self, feature):
         # Cover a feature's extent with S2 cells
