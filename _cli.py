@@ -13,8 +13,14 @@ def lambda_db():
 
 @lambda_db.command(name="build")
 @click.argument('feature_collection', type=click.File('r'))
-def build(feature_collection):
+@click.option('--include-geometry/--no-geometry', default=False)
+def build(feature_collection, include_geometry):
     data = json.load(feature_collection)
+
+    # Move geometry to data
+    if include_geometry:
+        for feat in data['features']:
+            feat['properties'].update({'geometry': feat['geometry']})
 
     with Database.load() as db:
         db.load_features(data)
@@ -22,7 +28,8 @@ def build(feature_collection):
 @lambda_db.command(name="deploy")
 @click.option('tag', '-t', type=str)
 @click.option('--public', default=False, type=bool)
-def deploy(tag, public):
+@click.option('--dry-run/--wet-run', default=False)
+def deploy(tag, public, dry_run):
     # Build lambda layer with docker
     print("Building docker image")
     subprocess.call('docker build . -t {}'.format(tag), shell=True)
@@ -30,13 +37,15 @@ def deploy(tag, public):
     print("Building lambda layer deployment package")
     subprocess.call('docker run --rm -v $PWD:/home/spatial-db -it {} package.sh'.format(tag), shell=True)
 
-    with Database.load() as db:
-        # Publish lambda layer
-        print("Publishing lambda layer to AWS")
-        lambda_layer = db.publish_lambda_layer(public=public)
+    if not dry_run:
+        with Database.load() as db:
+            # Publish lambda layer
+            print("Publishing lambda layer to AWS")
+            db.publish_lambda_layer(public=public)
 
-        info = db.info()
-        print(info)
+            print(json.dumps(db.info(), indent=2))
+    else:
+        print("dry-run flag is enabled, layer has not been published to AWS")
 
 @lambda_db.command(name="analyze")
 @click.argument('feature_collection', type=click.File('r'))
