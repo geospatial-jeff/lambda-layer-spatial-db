@@ -1,6 +1,6 @@
 # AWS Lambda Spatial Database
 
-I am an AWS Lambda native spatial database, allowing for vector data (currently polygons) to be packaged and queried with AWS Lambda.  The database implements the [Google S2 Library](http://s2geometry.io/) with a [B-tree](https://pythonhosted.org/BTrees/) to perform fast spatial lookups and is managed by [ZODB](http://www.zodb.org/en/latest/index.html), a native object database for Python.
+I am an AWS Lambda native spatial database, allowing for vector data (currently polygons) to be packaged, queried, and distributed through AWS Lambda.  The database implements the [Google S2 Library](http://s2geometry.io/) with a [B-tree](https://pythonhosted.org/BTrees/) to perform fast spatial lookups and is managed by [ZODB](http://www.zodb.org/en/latest/index.html), a native object database for Python.
 
 The database is packaged and deployed as an AWS Lambda Layer.  If the layer is publicly available, the database can be easily "imported" and queried by external Lambda Functions.  This library primarily provides a set of utilities for building, deploying, and querying lambda native spatial databases.
 
@@ -40,4 +40,9 @@ def spatial_query(event, context):
         }
 ```
 
-For a step-by-step guide on building your own lambda-native spatial database, check out the [docs](/docs/README.md)..
+For a step-by-step guide on building your own lambda-native spatial database, check out the [docs](/docs/README.md).
+
+#### TODOS
+
+- Add support for point features.
+- Add support for parallel spatial query.
