@@ -12,6 +12,8 @@ cd lambda-layer-spatial-db
 pip install -e .[dev]
 ```
 
+The library also requires an installation of the Google S2 Library which is not available via pip.  See the Dockerfile for instructions on how to build the Google S2 library plus python bindings (via SWIG). 
+
 #### QuickStart
 Your database application is defined in the `lambda_db` directory.  The library provides several CLI scripts for building and deploying the database.
 

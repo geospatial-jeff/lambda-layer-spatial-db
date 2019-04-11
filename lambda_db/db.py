@@ -1,11 +1,14 @@
 import os
 import sys
-s2_path = '/home/slingshot/Documents/Cognition/notebooks/s2/source/s2geometry/build/python'
 
-if s2_path not in sys.path:
-    sys.path.append(s2_path)
+try:
+    import pywraps2 as s2
+except:
+    s2_path = os.getenv('S2_LIBRARY_PATH')
+    if s2_path not in sys.path:
+        sys.path.append(s2_path)
+    import pywraps2 as s2
 
-import pywraps2 as s2
 from ZODB import FileStorage, DB
 from BTrees.OOBTree import OOBTree
 import transaction
@@ -15,12 +18,14 @@ client = boto3.client('lambda')
 
 class DatabaseConfig(object):
 
-    min_res = 10
-    max_res = 12
+    # DB config
+    min_res = 8
+    max_res = 14
     limit = 100
     unique_id = 'NAME'
-    db_name = 'MyDatabase'
+    db_name = 'WorldCitiesDatabase'
 
+    # Paths to things, don't change this
     db_path = os.path.join(os.path.dirname(__file__), 'database.fs')
     layer_path = os.path.join(os.path.dirname(__file__), 'lambda-layer.zip')
 
@@ -96,7 +101,7 @@ class Database(object):
             self.root.features[hash(id)] = feature['properties']
         return len(ids)
 
-    def spatial_query(self, geoj):
+    def spatial_query(self, geoj, multi=False):
         region = self.cover_region(geoj)
         db_feats = self.root()['features']
 
