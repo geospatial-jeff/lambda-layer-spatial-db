@@ -34,6 +34,7 @@ mkdir $DEPLOY_DIR/share
 cp $DB_DIR/$DBNAME.fs $DEPLOY_DIR/share/
 cp $DB_DIR/$DBNAME.fs.lock $DEPLOY_DIR/share/
 cp -r $DB_DIR/*.py $DEPLOY_DIR/python/
+cp $DB_DIR/config.yml $DEPLOY_DIR/python/
 
 # zip up deploy package
 cd $DEPLOY_DIR
