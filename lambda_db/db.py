@@ -18,23 +18,6 @@ import yaml
 
 client = boto3.client('lambda')
 
-
-def new_instance(self):
-    new_self = type(self).__new__(type(self))
-    # Preserve _transform, etc
-    new_self.__dict__ = self.__dict__.copy()
-    new_self.base = self.base.new_instance()
-    # Because these are bound methods, we must re-copy
-    # them or ivars might be wrong, like _transaction
-    for name in self.copied_methods:
-        v = getattr(new_self.base, name, None)
-        if v is not None:
-            setattr(new_self, name, v)
-
-    return new_self
-
-zc.zlibstorage.ZlibStorage.new_instances = new_instance
-
 class DatabaseConfig(object):
 
     @classmethod
@@ -197,3 +180,6 @@ class Database(object):
 
     def close(self):
         self.conn.close()
+
+with Database.load() as db:
+    print(db)
