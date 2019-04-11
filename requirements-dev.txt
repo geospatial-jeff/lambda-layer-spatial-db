@@ -1,4 +1,5 @@
 Click==7.0
+boto3==1.9.130
 BTrees==4.5.1
 numpy==1.16.2
 pyproj==2.1.3
