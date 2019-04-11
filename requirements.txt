@@ -1,3 +1,4 @@
 Click==7.0
 BTrees==4.5.1
+zc.zlibstorage==1.2.0
 ZODB==5.5.1

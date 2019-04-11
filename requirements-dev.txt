@@ -6,4 +6,5 @@ pyproj==2.1.3
 scipy==1.2.1
 shapely==1.6.4.post2
 tqdm==4.31.1
+zc.zlibstorage==1.2.0
 ZODB==5.5.1
