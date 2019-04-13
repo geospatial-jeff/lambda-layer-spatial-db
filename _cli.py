@@ -6,7 +6,6 @@ import click
 from lambda_db.db import Database
 from analyze import choose_res
 
-
 @click.group()
 def lambda_db():
     pass
@@ -31,6 +30,8 @@ def build(feature_collection, include_geometry):
 @click.option('--dry-run/--wet-run', default=False)
 def deploy(tag, public, dry_run):
     # Build lambda layer with docker
+    os.chdir(os.path.dirname(__file__))
+
     print("Building docker image")
     subprocess.call('docker build . -t {}'.format(tag), shell=True)
 
