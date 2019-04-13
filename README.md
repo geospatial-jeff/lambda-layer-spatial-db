@@ -48,3 +48,4 @@ For a step-by-step guide on building your own lambda-native spatial database, ch
 
 - Add support for point features.
 - Add support for parallel spatial query.
+- Shard database over multiple lambda layers.
