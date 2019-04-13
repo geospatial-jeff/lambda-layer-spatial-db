@@ -19,4 +19,4 @@ package:
   exclude:
     - "*.fs*"
     - "*.zip"
-    - "database.py"
+    - "db.py"
