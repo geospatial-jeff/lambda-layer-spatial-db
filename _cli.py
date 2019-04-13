@@ -27,7 +27,7 @@ def build(feature_collection, include_geometry):
 
 @lambda_db.command(name="deploy")
 @click.option('tag', '-t', type=str)
-@click.option('--public', default=False, type=bool)
+@click.option('--public/--not-public', default=False)
 @click.option('--dry-run/--wet-run', default=False)
 def deploy(tag, public, dry_run):
     # Build lambda layer with docker
