@@ -29,3 +29,7 @@ RUN pip install -r requirements.txt
 
 # Add Google S2 to PYTHONPATH
 ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.6/site-packages/"
+
+ENV \
+    AWS_DEFAULT_REGION=us-east-1 \
+    LAMBDA_DB_PATH=/home/cognition-datasources/spatial-db/lambda_db/database.fs
