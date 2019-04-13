@@ -64,6 +64,8 @@ class Database(object):
         # Switch the db path to lambda layer if deployed
         if deployed:
             config.db_path = '/opt/share/database.fs'
+        if 'LAMBDA_DB_PATH' in os.environ:
+            config.db_path = os.getenv('LAMBDA_DB_PATH')
 
         return config
 
