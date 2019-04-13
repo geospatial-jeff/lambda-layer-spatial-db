@@ -65,7 +65,7 @@ class Database(object):
         if deployed:
             config.db_path = '/opt/share/database.fs'
         if 'LAMBDA_DB_PATH' in os.environ:
-            config.db_path = 'LAMBDA_DB_PATH'
+            config.db_path = os.getenv('LAMBDA_DB_PATH')
 
         return config
 
