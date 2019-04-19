@@ -16,7 +16,7 @@ strip $DEPLOY_DIR/lib/* || true
 
 # Moving python libraries
 mkdir $DEPLOY_DIR/python
-EXCLUDE="shapely* urllib3* s3transfer* boto3* botocore* pip* docutils* *.pyc setuptools* wheel* coverage* testfixtures* mock* *.egg-info *.dist-info __pycache__ easy_install.py"
+EXCLUDE="awscli* shapely* urllib3* s3transfer* boto3* botocore* pip* docutils* *.pyc setuptools* wheel* coverage* testfixtures* mock* *.egg-info *.dist-info __pycache__ easy_install.py"
 
 EXCLUDES=()
 for E in ${EXCLUDE}
