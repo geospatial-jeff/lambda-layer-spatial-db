@@ -27,7 +27,7 @@ done
 rsync -ax $PYPATH/ $DEPLOY_DIR/python/ ${EXCLUDES[@]}
 
 # Moving Google S2 Library
-cp /build/s2geometry/build/python/* $DEPLOY_DIR/python/
+cp /home/cognition-datasources/s2geometry/build/python/* $DEPLOY_DIR/python/
 
 # Packaging database
 mkdir $DEPLOY_DIR/share
